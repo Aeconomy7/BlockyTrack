@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>BlockyTrack</title>
+	<link rel="icon" href="../img/px_bg_sea.png">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+	<script src="{{ url_for('static', filename='lib/cytoscape.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+</head>
+<body>
+	<div id="header">
+		<div id="app-name" class="funcolor">
+			<h1>BlockyTrack</h1>
+		</div>
+		<div id="exchange-rate" class="funcolor">Loading...</div>
+	</div>
+	<div id="main-container">
+		<div id="left-panel" class="wordwrap">
+			<div id="search-box">
+				<input type="text" id="wallet-address" placeholder="Enter wallet address">
+				<button id="search-button">Search</button>
+			</div>
+			<div id="balance"></div>
+			<div id="transactions-list"></div>
+		</div>
+		<div id="graph-container">
+			<div id="cy"></div>
+			<div id="amount">Click a node (wallet) or edge (transaction) to see the USD/BTC amount...</div>
+		</div>
+	</div>
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const searchButton = document.getElementById('search-button');
+			searchButton.addEventListener('click', function () {
+				const walletAddress = document.getElementById('wallet-address').value;
+				if (walletAddress) {
+					renderGraph(walletAddress);
+				}
+			});
+		});
+	</script>
+</body>
+</html>
