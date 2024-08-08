@@ -28,12 +28,15 @@ def update_btc_rate_thread():
 		global btc_exchange_rate
 		try:
 			url = "https://api.coindesk.com/v1/bpi/currentprice/BTC.json"
-			response = requests.get(url)
+			if(proxies == None):
+				response = requests.get(url)
+			else:
+				response = requests.get(url, proxies=proxies)
 			with lock:
 				btc_exchange_rate = response.json()['bpi']['USD']['rate_float']
 			print(f"[+] Got new BTC exchange rate: {btc_exchange_rate}")
 		except requests.RequestException as e:
-			print(f"Error fetching BTC exchange rate: {e}")
+			print(f"[!] Error fetching BTC exchange rate: {e}")
 		time.sleep(180)
 
 def start_thread_tasks():
@@ -48,10 +51,8 @@ def start_thread_tasks():
 def check_bitcoin_address(address):
 	if address.startswith("1") or address.startswith("3"):
 		try:
-			print(len(address))
 			decoded = base58.b58decode_check(address)
 			# Check if the length of the decoded address is 25 bytes
-			print(len(decoded))
 			if(len(decoded) == 25):
 				print(f"[+] Found valid base58 address: {address}")
 				return True
@@ -59,7 +60,7 @@ def check_bitcoin_address(address):
 				print(f"[-] Found invalid base58 address: {address}")
 				return False
 		except Exception:
-			print(f"[-] Error in base58.b58decode_check")
+			print(f"[!] Error in base58.b58decode_check")
 			return False
 
 	elif address.startswith("bc1"):
@@ -71,7 +72,7 @@ def check_bitcoin_address(address):
 			print(f"[-] Found invalid bech32 address: {address}")
 			return False
 	else:
-		print(f"[!] Found invalid address: {address}")
+		print(f"[-] Found invalid address: {address}")
 		return False
 
 # Function to get address details
@@ -81,7 +82,11 @@ def get_address_info(address):
 	if(wallet_check == True):
 		url = f"https://blockchain.info/rawaddr/{address}"
 		print(f"[+] Requesting address info: {address}")
-		response = requests.get(url)
+		if(proxies == None):
+			response = requests.get(url)
+		else:
+			response = requests.get(url, proxies=proxies)
+		#response = requests.get(url)
 		return response.json()
 	else:
 		return None
@@ -91,11 +96,14 @@ def get_transaction_info(tx_hash):
 	try:
 		url = f"https://blockchain.info/rawtx/{tx_hash}"
 		print(f"[+] Requesting transaction info: {tx_hash}")
-		response = requests.get(url)
-		print(response.json())
+		if(proxies == None):
+			response = requests.get(url)
+		else:
+			response = requests.get(url, proxies=proxies)
+		#response = requests.get(url)
 		return response.json()
 	except requests.RequestException as e:
-		print(f"Error fetching transaction data: {e}")
+		print(f"[!] Error fetching transaction data: {e}")
 		return None
 
 
@@ -106,7 +114,11 @@ def get_wallet_balance(wallet_address):
 	try:
 		url = f"https://blockchain.info/q/addressbalance/{wallet_address}"
 		print(f"[+] Requesting multi-wallet info: {wallet_address}")
-		response = requests.get(url)
+		if(proxies == None):
+			response = requests.get(url)
+		else:
+			response = requests.get(url, proxies=proxies)
+		#response = requests.get(url)
 		response.raise_for_status()  # Raise an exception for HTTP errors
 
 		# The balance is provided in satoshis (1 BTC = 100,000,000 satoshis)
@@ -115,7 +127,7 @@ def get_wallet_balance(wallet_address):
 
 		return balance_btc
 	except requests.RequestException as e:
-		print(f"Error fetching wallet balance: {e}")
+		print(f"[!] Error fetching wallet balance: {e}")
 		return None
 
 ##################
@@ -127,7 +139,6 @@ def index():
 
 @app.route('/btc_rate', methods=['GET'])
 def btc_exchange_rate():
-	print(btc_exchange_rate)
 	try:
 		return jsonify(btc_exchange_rate)
 	except Exception as e:
