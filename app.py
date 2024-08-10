@@ -12,8 +12,8 @@ app = Flask(__name__)
 ###############
 # For proxy, use the following command:
 #     ssh -D 8080 -i /path/to/privkey user@ip
-#proxies = None # Uncomment for no proxy
-proxies = {'http':'socks5h://localhost:8080','https':'socks5h://localhost:8080'} # Uncomment to use socks proxy
+proxies = None # Uncomment for no proxy
+#proxies = {'http':'socks5h://localhost:8080','https':'socks5h://localhost:8080'} # Uncomment to use socks proxy
 
 # global to store btc_exchange_rate, to be updated by threading task
 btc_exchange_rate = 0
